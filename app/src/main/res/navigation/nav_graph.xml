@@ -18,5 +18,6 @@
         android:id="@+id/cameraActivity"
         android:name="android.example.contactlesscheckout.CameraActivity"
         android:label="activity_camera"
-        tools:layout="@layout/activity_camera" />
+        tools:layout="@layout/activity_camera" >
+    </activity>
 </navigation>

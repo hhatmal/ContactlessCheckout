@@ -6,6 +6,7 @@ import java.io.File
 import java.util.concurrent.ExecutorService
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.Image
 import android.util.Log
@@ -16,6 +17,10 @@ import java.util.concurrent.Executors
 import androidx.camera.core.*
 import androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation
 import com.google.mlkit.vision.barcode.Barcode
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
@@ -23,11 +28,21 @@ import kotlinx.android.synthetic.main.activity_camera.*
 
 class CameraActivity : AppCompatActivity() {
     private lateinit var cameraExecutor: ExecutorService
+    private lateinit var viewModel: CameraViewModel
+    private val barcodeData : MutableLiveData<String> =  MutableLiveData<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
 
+        barcodeData.observe(this, Observer { it ->
+            if(!it.isNullOrEmpty()) {
+                val intent = Intent(this, PriceActivity::class.java).apply {
+                    putExtra("barcode", it)
+                }
+                startActivity(intent)
+            }
+        })
         // Request camera permissions
         if (allPermissionsGranted()) {
             startCamera()
@@ -108,7 +123,7 @@ class CameraActivity : AppCompatActivity() {
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
     }
 
-    private class ImageAnalyzer : ImageAnalysis.Analyzer {
+    private inner class ImageAnalyzer : ImageAnalysis.Analyzer {
         @SuppressLint("UnsafeExperimentalUsageError")
         override fun analyze(imageProxy: ImageProxy) {
             val mediaImage = imageProxy.image
@@ -123,36 +138,15 @@ class CameraActivity : AppCompatActivity() {
             val scanner = BarcodeScanning.getClient()
 
             // success listener is async, need to close on complete
-
-            // success listener is async, need to close on complete
-            val result = scanner.process(image)
+                scanner.process(image)
                 .addOnFailureListener {
-                    Log.w("test", "not working")
+                    Log.w("test", "not ")
                 }
                 .addOnSuccessListener { barcodes ->
                     if(!barcodes.isEmpty()) {
                         Log.w("test", "working")
-                        for (barcode in barcodes) {
-
-                            val bounds = barcode.boundingBox
-                            val corners = barcode.cornerPoints
-
-                            val rawValue = barcode.rawValue
-
-                            val valueType = barcode.valueType
-
-                            // See API reference for complete list of supported types
-                            when (valueType) {
-                                Barcode.TYPE_WIFI -> {
-                                    val ssid = barcode.wifi!!.ssid
-                                    val password = barcode.wifi!!.password
-                                    val type = barcode.wifi!!.encryptionType
-                                }
-                                Barcode.TYPE_URL -> {
-                                    val title = barcode.url!!.title
-                                    val url = barcode.url!!.url
-                                }
-                            }
+                        for(barcode in barcodes) {
+                            barcodeData.value = barcode.rawValue
                         }
                     }
                 }
