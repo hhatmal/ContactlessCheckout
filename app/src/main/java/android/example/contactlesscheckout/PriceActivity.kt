@@ -1,5 +1,6 @@
 package android.example.contactlesscheckout
 
+import android.content.Intent
 import android.example.contactlesscheckout.databinding.ActivityPriceBinding
 import android.os.Bundle
 import android.util.Log
@@ -28,9 +29,14 @@ class PriceActivity : AppCompatActivity() {
             }
         })
 
+        // navigate to main page upon successful add
         viewModel.addedMessageData.observe(this, Observer {
             it.getContentIfNotHandled().let {
                 Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
             }
         })
 

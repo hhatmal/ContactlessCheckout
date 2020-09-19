@@ -3,7 +3,6 @@ package android.example.contactlesscheckout
 import android.util.Log
 import androidx.databinding.Bindable
 import androidx.databinding.Observable
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.firestore.ktx.firestore
@@ -18,10 +17,8 @@ class PriceViewModel(barcode: String) : ViewModel(), Observable {
 
     // getters
     val barcodeData: String get() = barcode
-    val emptyMessageData: MutableLiveData<Event<String>>
-        get() = emptyMessage
-    val addedMessageData: MutableLiveData<Event<String>>
-        get() = addedMessage
+    val emptyMessageData: MutableLiveData<Event<String>> get() = emptyMessage
+    val addedMessageData: MutableLiveData<Event<String>> get() = addedMessage
     val priceData: MutableLiveData<String> get() = price
 
     fun addPrice() {
