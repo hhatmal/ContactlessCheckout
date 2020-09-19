@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".PriceActivity"></activity>
+        <activity android:name=".PriceViewModel"></activity>
+        <activity android:name=".PriceActivity" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"

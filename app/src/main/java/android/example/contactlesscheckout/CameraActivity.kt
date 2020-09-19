@@ -10,6 +10,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.Image
 import android.util.Log
+import android.util.Size
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -17,9 +18,7 @@ import java.util.concurrent.Executors
 import androidx.camera.core.*
 import androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import androidx.navigation.Navigation
 import com.google.mlkit.vision.barcode.Barcode
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -29,20 +28,32 @@ import kotlinx.android.synthetic.main.activity_camera.*
 class CameraActivity : AppCompatActivity() {
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var viewModel: CameraViewModel
-    private val barcodeData : MutableLiveData<String> =  MutableLiveData<String>()
+    private val barcodeData : MutableLiveData<String> =  MutableLiveData()
+    private lateinit var cameraProvider: ProcessCameraProvider
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
 
-        barcodeData.observe(this, Observer { it ->
+        barcodeData.observe(this, Observer {
             if(!it.isNullOrEmpty()) {
-                val intent = Intent(this, PriceActivity::class.java).apply {
-                    putExtra("barcode", it)
+                // image analysis gets called multiple times. Need to make sure not adding multiple activities
+                if(lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                    barcodeData.observe(this, Observer {
+                        if(!it.isNullOrEmpty()) {
+                            Log.w("testing", "activity created")
+                            cameraProvider.unbindAll()
+                            val intent = Intent(this, PriceActivity::class.java).apply {
+                                putExtra("barcode", it)
+                            }
+                            startActivity(intent)
+                            finish()
+                        }
+                    })
                 }
-                startActivity(intent)
             }
         })
+
         // Request camera permissions
         if (allPermissionsGranted()) {
             startCamera()
@@ -58,7 +69,7 @@ class CameraActivity : AppCompatActivity() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
         cameraProviderFuture.addListener(Runnable {
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+            cameraProvider = cameraProviderFuture.get()
 
             val preview = Preview.Builder()
                 .build()
