@@ -10,6 +10,8 @@ import com.google.firebase.ktx.Firebase
 
 class PriceViewModel(barcode: String) : ViewModel(), Observable {
     @Bindable
+    private val name = MutableLiveData<String>()
+    @Bindable
     private val price = MutableLiveData<String>()
     private val emptyMessage = MutableLiveData<Event<String>>()
     private val addedMessage = MutableLiveData<Event<String>>()

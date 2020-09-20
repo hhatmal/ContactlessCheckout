@@ -29,16 +29,15 @@ class MyRecyclerViewAdapter(var documentSnapShots: List<DocumentSnapshot>) : Rec
         documentSnapShots = newData
         notifyDataSetChanged()
     }
-
-    fun getReviewAt(position: Int) : DocumentSnapshot {
-        return documentSnapShots.get(position)
-    }
 }
 
 class MyViewHolder(val view : View) : RecyclerView.ViewHolder(view) {
     fun bind(document: DocumentSnapshot) {
-        val documentData = document.data
+        val name = document.get("name").toString()
+        val price = document.get("price").toString()
+
         view.barcode_name.text = document.id
-        //view.description_text_view.text = review.description
+        view.item_name.text = name
+        view.item_price.text = "$$price"
     }
 }

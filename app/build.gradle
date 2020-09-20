@@ -39,6 +39,7 @@ dependencies {
     def lifecycle_version = "2.2.0"
     def camerax_version = "1.0.0-beta08"
 
+    implementation 'com.android.support:cardview-v7:28.0.0'
     implementation 'com.google.firebase:firebase-firestore-ktx:21.6.0'
     implementation 'com.google.firebase:firebase-analytics:17.5.0'
     // The following line is optional, as the core library is included indirectly by camera-camera2
