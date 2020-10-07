@@ -18,6 +18,7 @@ class PriceViewModel(barcode: String) : ViewModel(), Observable {
     private val barcode = barcode
 
     // getters
+    val nameData: MutableLiveData<String> get() = name
     val barcodeData: String get() = barcode
     val emptyMessageData: MutableLiveData<Event<String>> get() = emptyMessage
     val addedMessageData: MutableLiveData<Event<String>> get() = addedMessage
@@ -33,6 +34,7 @@ class PriceViewModel(barcode: String) : ViewModel(), Observable {
         val priceValue = price.value?.toDouble()
 
         val item = hashMapOf(
+            "name" to nameData.value,
             "price" to priceValue
         )
 
